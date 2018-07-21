@@ -1,2 +1,2 @@
-FROM kube-proxy-amd64:v1.11.1
+FROM k8s.gcr.io/kube-proxy-amd64:v1.11.1
 MAINTAINER huasuoworld <huasuoworld@outlook.com>
