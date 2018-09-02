@@ -1,0 +1,12 @@
+  764  wget https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+  766  wget https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+  768  mv cfssl_linux-amd64 /usr/bin/cfssl
+  769  mv cfssljson_linux-amd64 /usr/bin/cfssljson
+  770  cfssl --help
+  771  chmod 777 /usr/bin/cfssl
+  772  chmod 777 /usr/bin/cfssljson 
+  773  cfssl
+  776  cfssl gencert --initca=true etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
+  777  cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd
+  785  cfssl gencert --initca=true etcd-root-ca-csr.json | cfssljson --bare etcd-root-ca
+  786  cfssl gencert --ca etcd-root-ca.pem --ca-key etcd-root-ca-key.pem --config etcd-gencert.json etcd-csr.json | cfssljson --bare etcd
