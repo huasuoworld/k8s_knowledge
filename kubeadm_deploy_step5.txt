@@ -1,0 +1,42 @@
+kubeadm alpha phase certs etcd-server --config=/tmp/${zoo5}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/${zoo5}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/${zoo5}/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/${zoo5}/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/${zoo5}/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/${zoo4}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/${zoo4}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/${zoo4}/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/${zoo4}/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/${zoo4}/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/${zoo3}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/${zoo3}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/${zoo3}/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/${zoo3}/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/${zoo3}/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/${zoo2}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/${zoo2}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/${zoo2}/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/${zoo2}/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/${zoo2}/
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/${zoo1}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/${zoo1}/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/${zoo1}/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/${zoo1}/kubeadmcfg.yaml
+# No need to move the certs because they are for zoo1
+
+# clean up certs that should not be copied off this host
+find /tmp/${zoo5} -name ca.key -type f -delete
+find /tmp/${zoo4} -name ca.key -type f -delete
+find /tmp/${zoo3} -name ca.key -type f -delete
+find /tmp/${zoo2} -name ca.key -type f -delete
