@@ -1,0 +1,22 @@
+systemctl daemon-reload
+systemctl enable etcd.service
+systemctl start etcd.service
+systemctl restart etcd.service
+systemctl status etcd.service
+
+systemctl stop etcd.service
+
+etcdctl cluster-health
+
+rm -rf /var/lib/etcd/*
+rm -rf /data/etcd/*
+
+
+journalctl -xeu etcd
+
+systemctl enable flanneld.service
+systemctl start flanneld.service
+systemctl status flanneld.service
+
+systemctl restart docker.service
+systemctl status docker.service
