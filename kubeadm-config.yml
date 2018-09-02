@@ -1,0 +1,16 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  advertiseAddress: 192.168.1.191
+etcd:
+  endpoints:
+  - http://192.168.1.191:2379
+  - http://192.168.1.192:2379
+  - http://192.168.1.193:2379
+  
+  1、安装k8s etcd
+  https://kubernetes.io/docs/setup/independent/setup-ha-etcd-with-kubeadm/
+  
+  https://kubernetes.io/docs/setup/independent/high-availability/
+  
+  https://yq.aliyun.com/articles/66474
