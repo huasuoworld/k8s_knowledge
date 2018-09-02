@@ -1,0 +1,118 @@
+vi /etc/selinux/config
+SELINUX=disabled
+reboot
+
+Disable 
+sudo swapoff -a 
+Enabled 
+sudo swapon -a
+
+cat << EOF > /etc/systemd/system/kubelet.service.d/20-etcd-service-manager.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/kubelet --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --cgroup-driver=systemd --runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice
+Restart=always
+EOF
+
+vi /etc/systemd/system/kubelet.service.d/20-etcd-service-manager.conf
+--runtime-cgroups=/systemd/system.slice --kubelet-cgroups=/systemd/system.slice
+
+journalctl -f
+
+rm -rf /var/lib/etcd/*
+systemctl daemon-reload
+systemctl restart kubelet
+
+
+
+kubectl config view
+kubectl config set-cluster CLUSTER_NAME_FROM_CREDENTIALS
+kubectl config set-context CONTEXT_NAME_FROM_CREDENTIALS
+
+kubeadm init --kubernetes-version stable
+kubeadm init --kubernetes-version=stable
+
+
+kubeadm alpha phase certs etcd-server --config=/tmp/192.168.1.9/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/192.168.1.9/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/192.168.1.9/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/192.168.1.9/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/192.168.1.9/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/192.168.1.8/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/192.168.1.8/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/192.168.1.8/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/192.168.1.8/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/192.168.1.8/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/192.168.1.7/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/192.168.1.7/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/192.168.1.7/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/192.168.1.7/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/192.168.1.7/
+# cleanup non-reusable certificates
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/192.168.1.6/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/192.168.1.6/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/192.168.1.6/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/192.168.1.6/kubeadmcfg.yaml
+cp -R /etc/kubernetes/pki /tmp/192.168.1.6/
+find /etc/kubernetes/pki -not -name ca.crt -not -name ca.key -type f -delete
+
+kubeadm alpha phase certs etcd-server --config=/tmp/192.168.1.5/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-peer --config=/tmp/192.168.1.5/kubeadmcfg.yaml
+kubeadm alpha phase certs etcd-healthcheck-client --config=/tmp/192.168.1.5/kubeadmcfg.yaml
+kubeadm alpha phase certs apiserver-etcd-client --config=/tmp/192.168.1.5/kubeadmcfg.yaml
+# No need to move the certs because they are for zoo1
+
+# clean up certs that should not be copied off this host
+find /tmp/192.168.1.9 -name ca.key -type f -delete
+find /tmp/192.168.1.8 -name ca.key -type f -delete
+find /tmp/192.168.1.7 -name ca.key -type f -delete
+find /tmp/192.168.1.6 -name ca.key -type f -delete
+
+mkdir /home/root
+
+cp -r /tmp/192.168.1.6/* /home/root
+cp -r /tmp/192.168.1.7/* /home/root
+cp -r /tmp/192.168.1.8/* /home/root
+cp -r /tmp/192.168.1.9/* /home/root
+
+root@zoo1 $ kubeadm alpha phase etcd local --config=/tmp/192.168.1.5/kubeadmcfg.yaml
+root@zoo2 $ kubeadm alpha phase etcd local --config=/home/root/kubeadmcfg.yaml
+root@zoo3 $ kubeadm alpha phase etcd local --config=/home/root/kubeadmcfg.yaml
+root@zoo4 $ kubeadm alpha phase etcd local --config=/home/root/kubeadmcfg.yaml
+root@zoo5 $ kubeadm alpha phase etcd local --config=/home/root/kubeadmcfg.yaml
+
+chown -R root:root /etc/kubernetes/pki
+
+docker run --rm -it \
+--net host \
+-v /etc/kubernetes:/etc/kubernetes quay.io/coreos/etcd:v3.2.18 etcdctl \
+--cert-file /etc/kubernetes/pki/etcd/peer.crt \
+--key-file /etc/kubernetes/pki/etcd/peer.key \
+--ca-file /etc/kubernetes/pki/etcd/ca.crt \
+--endpoints https://192.168.1.5:2379 cluster-health
+
+vi /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+--pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google-containers/pause-amd64:3.1
+systemctl enable kubelet && systemctl start kubelet
+
+sysctl net.bridge.bridge-nf-call-iptables=1
+
+systemctl status kubelet
+
+
+docker pull kubernetes/pause
+docker images | grep pause
+docker tag f9d5de079539 k8s.gcr.io/pause:3.1
+
+
+docker pull outrider/etcd-amd64
+docker images | grep etcd-amd
+docker tag a9308c067589 k8s.gcr.io/etcd-amd64:3.2.18
