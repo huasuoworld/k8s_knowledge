@@ -1,0 +1,11 @@
+[Unit]
+Description=Etcd Server
+After=network.target
+[Service]
+Type=simple
+EnvironmentFile=-/etc/etcd/etcd.conf
+WorkingDirectory=/var/lib/etcd/
+ExecStart=/usr/bin/etcd --config-file=/etc/etcd/etcd.yml
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
