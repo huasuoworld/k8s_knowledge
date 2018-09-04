@@ -1,0 +1,15 @@
+[Unit]
+Description=Kubernetes Scheduler
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=kube-apiserver.service
+Requires=kube-apiserver.service
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/scheduler
+ExecStart=/usr/bin/kube-scheduler --master=http://10.1.35.1:8080 \
+--logtostderr=true --log-dir=/var/log/kubernetes --v=2
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
