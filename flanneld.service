@@ -1,0 +1,17 @@
+[Unit]
+Description=flannel Server
+Documentation=https://github.com/coreos/flannel
+After=network.target etcd.service
+Before=docker.service
+[Service]
+Type=simple
+EnvironmentFile=-/etc/flannel/flannel.conf
+WorkingDirectory=/var/lib/flannel/
+ExecStart=/usr/bin/flanneld -etcd-cafile=/etc/kubernetes/pki2/etcd-root-ca.pem \
+-etcd-certfile=/etc/kubernetes/pki2/etcd.pem \
+-etcd-endpoints=https://192.168.1.5:2379,https://192.168.1.6:2379,https://192.168.1.7:2379,https://192.168.1.8:2379,https://192.168.1.9:2379 \
+-etcd-keyfile=/etc/kubernetes/pki2/etcd-key.pem \
+-ip-masq=true -iface=192.168.1.5
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
