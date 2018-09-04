@@ -1,3 +1,10 @@
+Disable 
+sudo swapoff -a 
+Enabled 
+sudo swapon -a
+
+journalctl -xeu xxx.service
+
 systemctl daemon-reload
 systemctl enable etcd.service
 systemctl start etcd.service
@@ -20,3 +27,32 @@ systemctl status flanneld.service
 
 systemctl restart docker.service
 systemctl status docker.service
+
+systemctl daemon-reload
+systemctl enable kube-apiserver.service
+systemctl start kube-apiserver.service
+systemctl enable kube-controller-manager.service
+systemctl start kube-controller-manager.service
+systemctl enable kube-scheduler.service
+systemctl start kube-scheduler.service
+
+
+systemctl status kube-apiserver.service
+systemctl status kube-controller-manager.service
+systemctl status kube-scheduler.service
+
+systemctl enable kubelet
+systemctl start kubelet
+systemctl status kubelet
+
+systemctl enable kube-proxy
+systemctl start kube-proxy
+systemctl status kube-proxy
+
+kubectl get nodes
+
+kubectl get svc
+
+kubectl get cs
+
+https://192.168.1.5:8080/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
