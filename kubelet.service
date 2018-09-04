@@ -1,0 +1,18 @@
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Requires=docker.service
+
+[Service]
+WorkingDirectory=/var/lib/kubelet
+EnvironmentFile=-/etc/kubernetes/kubelet
+ExecStart=/usr/bin/kubelet --address=10.1.84.1 --port=10250 --hostname-override=10.1.84.1 \
+--allow-privileged=false --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+--cluster-dns=10.1.0.2 --cluster-domain=cluster.local --fail-swap-on=false \
+--logtostderr=true --log-dir=/var/log/kubernetes --v=4 --cgroup-driver=systemd
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
