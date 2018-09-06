@@ -1,7 +1,10 @@
-# k8s_knowledge
-k8s_knowledge
+# k8s_knowledge<br>
+k8s_knowledge<br>
 
-Disable
-sudo swapoff -a
-Enabled
-sudo swapon -a
+Disable<br>
+sudo swapoff -a<br>
+Enabled<br>
+sudo swapon -a<br>
+
+Verify which cgroup driver dockerd is using<br>
+docker info |grep -i cgroup<br>
