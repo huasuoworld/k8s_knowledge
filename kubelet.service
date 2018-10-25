@@ -1,17 +1,16 @@
 [Unit]
-Description=Kubernetes Kubelet Server
+Description=Kubernetes Kube-proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
-After=docker.service
-Requires=docker.service
+After=network.target
+Requires=network.target
 
 [Service]
-WorkingDirectory=/var/lib/kubelet
-EnvironmentFile=-/etc/kubernetes/kubelet
-ExecStart=/usr/bin/kubelet --address=127.0.0.1 --port=10250 --hostname-override=127.0.0.1 \
---allow-privileged=false --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
---cluster-dns=10.1.0.2 --cluster-domain=cluster.local --fail-swap-on=false \
---logtostderr=true --log-dir=/var/log/kubernetes --v=4 --cgroup-driver=cgroupfs
+EnvironmentFile=-/etc/kubernetes/proxy
+ExecStart=/usr/bin/kube-proxy \
+--master=http://127.0.0.1:8080 --hostname-override=127.0.0.1 \
+--logtostderr=true --log-dir=/var/log/kubernetes --v=4
 Restart=on-failure
+LimitNOFILE=65536
 KillMode=process
 
 [Install]
