@@ -4,15 +4,19 @@ Documentation=https://github.com/kubernetes/kubernetes
 After=etcd.service
 Wants=etcd.service
 [Service]
-EnvironmentFile=/etc/kubernetes/apiserver
+EnvironmentFile=-/run/flannel/subnet.env
 ExecStart=/usr/bin/kube-apiserver --storage-backend=etcd3 \
---etcd-servers=https://192.168.1.5:2379,https://192.168.1.6:2379,https://192.168.1.7:2379,https://192.168.1.8:2379,https://192.168.1.9:2379 \
---etcd-cafile=/etc/kubernetes/pki2/etcd-root-ca.pem \
---etcd-certfile=/etc/kubernetes/pki2/etcd.pem \
---etcd-keyfile=/etc/kubernetes/pki2/etcd-key.pem \
---insecure-bind-address=0.0.0.0  --insecure-port=8080 \
---service-cluster-ip-range=10.1.0.0/24 --service-node-port-range=1-65535 \
---admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,DefaultStorageClass,ResourceQuota \
+--etcd-servers=https://127.0.0.1:2379 \
+--etcd-cafile=/etc/etcd/etcd-root-ca.pem \
+--etcd-certfile=/etc/etcd/etcd.pem \
+--etcd-keyfile=/etc/etcd/etcd-key.pem \
+--client-ca-file=/opt/kube/cfssl/ca.pem \
+--tls-cert-file=/opt/kube/cfssl/server.pem \
+--tls-private-key-file=/opt/kube/cfssl/server-key.pem \
+--insecure-bind-address=127.0.0.1  --insecure-port=8080 \
+--service-cluster-ip-range=10.1.0.0/24 --service-node-port-range=3-65535 \
+--admission-control=NamespaceExists,SecurityContextDeny,ServiceAccount,DefaultStorageClass,ResourceQuota \
+#--admission-control= \
 --logtostderr=true --log-dir=/var/log/kubernetes --v=2
 Restart=on-failure
 Type=notify
