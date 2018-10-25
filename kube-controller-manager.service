@@ -6,7 +6,12 @@ Requires=kube-apiserver.service
 
 [Service]
 EnvironmentFile=-/etc/kubernetes/controller-manager
-ExecStart=/usr/bin/kube-controller-manager --master=http://10.1.35.1:8080 \
+ExecStart=/usr/bin/kube-controller-manager \
+--tls-cert-file=/opt/kube/cfssl/server.pem \
+--tls-private-key-file=/opt/kube/cfssl/server-key.pem \
+--root-ca-file=/opt/kube/cfssl/ca.pem \
+--service-account-private-key-file=/opt/kube/cfssl/server-key.pem \
+--master=http://127.0.0.1:8080 \
 --logtostderr=true --log-dir=/var/log/kubernetes --v=2
 Restart=on-failure
 LimitNOFILE=65536
