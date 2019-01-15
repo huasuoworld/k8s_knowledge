@@ -1,5 +1,13 @@
 # 	kubernetes cluster setup
 
+if you loss some k8s image , you can download from 
+
+https://hub.docker.com/u/huasuoworld
+
+when you pull image , please take care the tag
+
+
+
 ## 1. download kubernetes server-binaries
 
 https://kubernetes.io/docs/setup/release/notes/#server-binaries
@@ -243,6 +251,14 @@ https://github.com/kubernetes/kubernetes/releases
    auto-compaction-retention: "1"
    ```
 
+   subnet enviroment setup
+   ```
+   etcdctl \
+   --cert-file /etc/kubernetes/cert/etcd.pem \
+   --key-file /etc/kubernetes/cert/etcd-key.pem \
+   --ca-file /etc/kubernetes/cert/etcd-root-ca.pem \
+   --endpoints https://192.168.1.0:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
+   ```
 
 
 ## 4. systemctl flannel.service
@@ -824,3 +840,4 @@ Name:      kubernetes
 Address 1: 10.1.0.1 kubernetes.default.svc.default.svc.default.svc.cluster.local
 
 ```
+
