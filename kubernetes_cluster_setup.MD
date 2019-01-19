@@ -254,10 +254,10 @@ https://github.com/kubernetes/kubernetes/releases
    subnet enviroment setup
    ```
    etcdctl \
-   --cert-file /etc/kubernetes/cert/etcd.pem \
-   --key-file /etc/kubernetes/cert/etcd-key.pem \
-   --ca-file /etc/kubernetes/cert/etcd-root-ca.pem \
-   --endpoints https://192.168.1.0:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
+  --cert-file /etc/kubernetes/cert/server.pem \
+  --key-file /etc/kubernetes/cert/server-key.pem \
+  --ca-file /etc/kubernetes/cert/ca.pem \
+  --endpoints https://192.168.1.0:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
    ```
 
 
