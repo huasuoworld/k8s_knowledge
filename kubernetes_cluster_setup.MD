@@ -647,6 +647,7 @@ etcdctl \
 --endpoints https://192.168.1.0:2379 cluster-health
 ```
 ```shell
+systemctl start kube-apiserver.service
 systemctl start kube-controller-manager.service
 systemctl start kube-scheduler.service
 systemctl start kubelet.service
