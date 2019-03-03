@@ -4,7 +4,7 @@ if you loss some k8s image , you can download from
 
 https://hub.docker.com/u/huasuoworld
 
-when you pull image , please take care the tag
+when you pull image , please be carefully
 
 
 
@@ -16,7 +16,17 @@ or
 
 https://github.com/kubernetes/kubernetes/releases
 
-​	copy kube-apiserver kube-controller-manager kube-scheduler kubectl kubelet kube-proxy  to master node /usr/bin, copy kubectl kubelet kube-proxy to slave node /usr/bin.
+​	master node
+
+~~~	shell
+cp kube-apiserver kube-controller-manager kube-scheduler kubectl kubelet kube-proxy  /usr/bin
+~~~
+
+slave
+
+~~~shell
+cp kubectl kubelet kube-proxy /usr/bin
+~~~
 
 ​	将 kube-apiserver kube-controller-manager kube-scheduler kubectl kubelet kube-proxy 拷贝到主节点/usr/bin, 将kubectl kubelet kube-proxy 拷贝到从节点 /usr/bin.
 
@@ -26,7 +36,11 @@ https://github.com/kubernetes/kubernetes/releases
 
 ​	https://github.com/etcd-io/etcd/releases
 
-​	copy etcd etcdctl to nodes /usr/bin.
+​	
+
+~~~shell
+cp etcd etcdctl /usr/bin
+~~~
 
 ​	将etcd etcdctl拷贝到 /usr/bin目录下.
 
@@ -36,7 +50,14 @@ https://github.com/kubernetes/kubernetes/releases
 
 ​	https://github.com/coreos/flannel/releases
 
-​	copy flanneld to nodes /usr/bin.
+​	
+
+~~~shell
+cp flanneld /usr/bin
+~~~
+
+
+​	
 
 ​	将 flanneld 拷贝到/usr/bin.
 
@@ -46,7 +67,7 @@ https://github.com/kubernetes/kubernetes/releases
 
 1. Download, unpack and prepare the command line tools as shown below. Note that you may need to adapt the sample commands based on the hardware architecture and cfssl version you are using.
 
-   ```
+   ```json
    curl -L https://pkg.cfssl.org/R1.2/cfssl_linux-amd64 -o cfssl
    chmod +x cfssl
    curl -L https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64 -o cfssljson
@@ -57,7 +78,7 @@ https://github.com/kubernetes/kubernetes/releases
 
 2. Create a directory to hold the artifacts and initialize cfssl:
 
-   ```
+   ```shell
    mkdir cert
    cd cert
    ../cfssl print-defaults config > config.json
@@ -66,7 +87,7 @@ https://github.com/kubernetes/kubernetes/releases
 
 3. Create a JSON config file for generating the CA file, for example, `ca-config.json`:
 
-   ```
+   ```json
    {
      "signing": {
        "default": {
@@ -89,7 +110,7 @@ https://github.com/kubernetes/kubernetes/releases
 
 4. Create a JSON config file for CA certificate signing request (CSR), for example, `ca-csr.json`. Be sure the replace the values marked with angle brackets with real values you want to use.
 
-   ```
+   ```json
    {
      "CN": "kubernetes",
      "key": {
@@ -108,13 +129,15 @@ https://github.com/kubernetes/kubernetes/releases
 
 5. Generate CA key (`ca-key.pem`) and certificate (`ca.pem`):
 
-   ```
+   ```shell
    ../cfssl gencert -initca ca-csr.json | ../cfssljson -bare ca
    ```
 
+   
+
 6. Create a JSON config file for generating keys and certificates for the API server as shown below. Be sure to replace the values in angle brackets with real values you want to use. The `MASTER_CLUSTER_IP` is the service cluster IP for the API server as described in previous subsection. The sample below also assumes that you are using `cluster.local` as the default DNS domain name.
 
-   ```
+   ```json
    {
      "CN": "kubernetes",
      "hosts": [
@@ -141,9 +164,9 @@ https://github.com/kubernetes/kubernetes/releases
    }
    ```
 
-7. Generate the key and certificate for the API server, which are by default saved into file `server-key.pem` and `server.pem` respectively:
+7. Generate the key and certificate for the API server, which are by default saved into file server-key.pem and server.pem respectively:
 
-   ```
+   ```shell
    ../cfssl gencert -ca=ca.pem -ca-key=ca-key.pem \
    --config=ca-config.json -profile=kubernetes \
    server-csr.json | ../cfssljson -bare server
@@ -157,7 +180,7 @@ https://github.com/kubernetes/kubernetes/releases
 
    go to /usr/lib/systemd/system
 
-   ```
+   ```shell
    [Unit]
    Description=Etcd Server
    After=network.target
@@ -169,7 +192,7 @@ https://github.com/kubernetes/kubernetes/releases
    WantedBy=multi-user.target
    ```
 
-   ```
+   ```yaml
    # This is the configuration file for the etcd server.
    
    # Human-readable name for this member.
@@ -252,19 +275,29 @@ https://github.com/kubernetes/kubernetes/releases
    ```
 
    subnet enviroment setup
-   ```
+   ```shell
    etcdctl \
-  --cert-file /etc/kubernetes/cert/server.pem \
-  --key-file /etc/kubernetes/cert/server-key.pem \
-  --ca-file /etc/kubernetes/cert/ca.pem \
-  --endpoints https://192.168.1.0:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
+   --cert-file /etc/kubernetes/cert/server.pem \
+   --key-file /etc/kubernetes/cert/server-key.pem \
+   --ca-file /etc/kubernetes/cert/ca.pem \
+   --endpoints https://192.168.1.5:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
    ```
+
+   check cluster health
+
+   ~~~shell
+   etcdctl \
+   --cert-file /etc/kubernetes/cert/server.pem \
+   --key-file /etc/kubernetes/cert/server-key.pem \
+   --ca-file /etc/kubernetes/cert/ca.pem \
+   --endpoints https://192.168.1.5:2379 cluster-health
+   ~~~
 
 
 ## 4. systemctl flannel.service
 
-​
-   ```
+
+   ```shell
 [Unit]
 Description=flannel Server
 Documentation=https://github.com/coreos/flannel
@@ -287,7 +320,7 @@ WantedBy=multi-user.target
 ## 5. kubernetes cluster config
 
 /root/.kube/config
-   ```
+   ```yaml
 apiVersion: v1
 clusters:
 - cluster:
@@ -311,9 +344,11 @@ users:
 kubectl config use-context kubelet-context
 
 ## 6. systemctl docker.service
-	add parameter "--bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU}"
+```shell
+add parameter "--bip=${FLANNEL_SUBNET} --mtu=${FLANNEL_MTU}"
+```
 
-   ```
+   ```shell
 [Unit]
 Description=Docker Application Container Engine
 Documentation=https://docs.docker.com
@@ -354,7 +389,7 @@ WantedBy=multi-user.target
 
 ## 7. systemctl kube-apiserver.service
 
-```
+```shell
 # more /usr/lib/systemd/system/kube-apiserver.service
 [Unit]
 Description=Kubernetes API Server
@@ -385,7 +420,7 @@ WantedBy=multi-user.target
 
 ## 8. systemctl kube-scheduler.service
 
-```
+```shell
 # more /usr/lib/systemd/system/kube-scheduler.service
 [Unit]
 Description=Kubernetes Scheduler
@@ -407,7 +442,7 @@ WantedBy=multi-user.target
 
 ## 9. systemctl kube-controller-manager.service
 
-```
+```shell
 # more /usr/lib/systemd/system/kube-controller-manager.service
 [Unit]
 Description=Kubernetes Controller Manager
@@ -433,7 +468,7 @@ WantedBy=multi-user.target
 ## 10.systemctl kubelet.service
 
 zoo0
-```
+```shell
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -454,7 +489,7 @@ WantedBy=multi-user.target
 ```
 
 zoo1
-```
+```shell
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -475,7 +510,7 @@ WantedBy=multi-user.target
 ```
 
 zoo2
-```
+```shell
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -496,7 +531,7 @@ WantedBy=multi-user.target
 ```
 
 zoo3
-```
+```shell
 [Unit]
 Description=Kubernetes Kubelet Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -519,7 +554,7 @@ WantedBy=multi-user.target
 ## 11.systemctl Kube-proxy.service
 
 zoo0
-```
+```shell
 [Unit]
 Description=Kubernetes Kube-proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -539,7 +574,7 @@ KillMode=process
 WantedBy=multi-user.target
 ```
 zoo1
-```
+```shell
 [Unit]
 Description=Kubernetes Kube-proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -559,7 +594,7 @@ KillMode=process
 WantedBy=multi-user.target
 ```
 zoo2
-```
+```shell
 [Unit]
 Description=Kubernetes Kube-proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -579,7 +614,7 @@ KillMode=process
 WantedBy=multi-user.target
 ```
 zoo3
-```
+```shell
 [Unit]
 Description=Kubernetes Kube-proxy Server
 Documentation=https://github.com/GoogleCloudPlatform/kubernetes
@@ -604,40 +639,34 @@ WantedBy=multi-user.target
 2. start flannel.service
 3. check etcd cluster health 
 
-```
+```shell
 etcdctl \
 --cert-file /etc/kubernetes/cert/etcd.pem \
 --key-file /etc/kubernetes/cert/etcd-key.pem \
 --ca-file /etc/kubernetes/cert/etcd-root-ca.pem \
 --endpoints https://192.168.1.0:2379 cluster-health
 ```
-4. start kube-apiserver.service
+```shell
+systemctl start kube-controller-manager.service
+systemctl start kube-scheduler.service
+systemctl start kubelet.service
+systemctl start kube-proxy.service
+kubectl get nodes
+kubectl get svc
 
-5. start kube-controller-manager.service
+```
 
-6. start kube-scheduler.service
 
-7. start kubelet.service
-
-8. start kube-proxy.service
-
-9. check k8s cluster health
-
-   kubectl get nodes
-
-   kubectl get svc
-
-   
 
 ## 13. deploy kubernetes-dashboard
 
-```
+```shell
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
 ```
 
 ## 14. deploy core-dns
 
-```
+```yaml
 #CHINE_GENERATED_WARNING__
 apiVersion: v1
 kind: ServiceAccount
@@ -831,7 +860,7 @@ spec:
 ## 15. check dns
 
 
-```
+```shell
 [root@localhost kubernetes]# kubectl exec busybox1 nslookup kubernetes
 Server:    10.2.0.2
 Address 1: 10.2.0.2 kube-dns.kube-system.svc.default.svc.default.svc.cluster.local
@@ -840,4 +869,3 @@ Name:      kubernetes
 Address 1: 10.1.0.1 kubernetes.default.svc.default.svc.default.svc.cluster.local
 
 ```
-
