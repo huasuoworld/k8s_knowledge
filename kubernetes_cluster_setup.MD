@@ -280,7 +280,7 @@ cp flanneld /usr/bin
    --cert-file /etc/kubernetes/cert/server.pem \
    --key-file /etc/kubernetes/cert/server-key.pem \
    --ca-file /etc/kubernetes/cert/ca.pem \
-   --endpoints https://192.168.1.5:2379 mk /coreos.com/network/config '{ "Network": "10.1.0.0/16", "Backend": {"Type": "vxlan"} }'
+   --endpoints https://192.168.1.5:2379 mk /coreos.com/network/config '{ "Network": "10.2.0.0/16", "Backend": {"Type": "vxlan"} }'
    ```
 
    check cluster health
